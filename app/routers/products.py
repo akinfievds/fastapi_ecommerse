@@ -95,7 +95,7 @@ async def get_all_products(
     total = await db.scalar(total_stmt) or 0
 
     # Основной запрос (если есть поиск - добавим ранг в выборку и сортировку)
-    if rank_col is not None:
+    if rank_col is not None:  # TODO Почему нельзя использовать просто 'if rank_col:'
         products_stmt = (
             select(ProductModel, rank_col)
             .where(*filters)
