@@ -1,21 +1,17 @@
 import jwt
-
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
 from fastapi.security import OAuth2PasswordRequestForm
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth import (
-    hash_password,
-    verify_password,
-    create_access_token,
-    create_refresh_token,
-)
-from app.config import SECRET_KEY, ALGORITHM
-from app.models.users import User as UserModel
-from app.schemas import UserCreate, User as UserSchema, RefreshTokenRequest
+from app.auth import (create_access_token, create_refresh_token, hash_password,
+                      verify_password)
+from app.config import ALGORITHM, SECRET_KEY
 from app.db_depends import get_async_db
-
+from app.models.users import User as UserModel
+from app.schemas import RefreshTokenRequest
+from app.schemas import User as UserSchema
+from app.schemas import UserCreate
 
 router = APIRouter(prefix="/users", tags=["users"])
 

@@ -1,22 +1,16 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Query
-from sqlalchemy import select, update, func, desc, or_
-
-from app.models.products import Product as ProductModel
-from app.models.categories import Category as CategoryModel
-from app.models.reviews import Review as ReviewModel
-from app.models.users import User as UserModel
-from app.schemas import (
-    Product as ProductSchema,
-    ProductCreate,
-    Review as ReviewSchema,
-    ProductList,
-)
-
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy import desc, func, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db_depends import get_async_db
 from app.auth import get_current_seller
-
+from app.db_depends import get_async_db
+from app.models.categories import Category as CategoryModel
+from app.models.products import Product as ProductModel
+from app.models.reviews import Review as ReviewModel
+from app.models.users import User as UserModel
+from app.schemas import Product as ProductSchema
+from app.schemas import ProductCreate, ProductList
+from app.schemas import Review as ReviewSchema
 
 router = APIRouter(
     prefix="/products",

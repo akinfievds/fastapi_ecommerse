@@ -1,8 +1,9 @@
 from decimal import Decimal
-from sqlalchemy import String, Boolean, Integer, Numeric, Float, text, Computed, Index
+
+from sqlalchemy import (Boolean, Computed, Float, ForeignKey, Index, Integer,
+                        Numeric, String, text)
 from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import ForeignKey
 
 from app.database import Base
 from app.models.categories import Category

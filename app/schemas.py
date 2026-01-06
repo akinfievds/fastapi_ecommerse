@@ -1,7 +1,7 @@
-from pydantic import BaseModel, Field, ConfigDict, EmailStr
+from datetime import datetime
 from decimal import Decimal
 
-from datetime import datetime
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
 class CategoryCreate(BaseModel):

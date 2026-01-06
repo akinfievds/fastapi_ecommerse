@@ -1,8 +1,9 @@
-from app.database import Base
-from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
-from sqlalchemy import ForeignKey, String, DateTime, Integer, Boolean
-
 from datetime import datetime
+
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
+
+from app.database import Base
 
 
 class Review(Base):

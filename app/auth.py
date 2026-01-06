@@ -1,12 +1,13 @@
-import jwt
-from passlib.context import CryptContext
-from fastapi.security import OAuth2PasswordBearer
 from datetime import datetime, timedelta, timezone
-from fastapi import Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
 
-from app.config import SECRET_KEY, ALGORITHM
+import jwt
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
+from passlib.context import CryptContext
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.config import ALGORITHM, SECRET_KEY
 from app.db_depends import get_async_db
 from app.models.users import User as UserModel
 

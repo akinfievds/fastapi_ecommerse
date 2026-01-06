@@ -1,15 +1,13 @@
-from fastapi import APIRouter, Depends, status, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select, update
-
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db_depends import get_async_db
 from app.auth import get_current_seller
-
+from app.db_depends import get_async_db
 from app.models.categories import Category as CategoryModel
 from app.models.users import User as UserModel
-from app.schemas import Category as CategorySchema, CategoryCreate
-
+from app.schemas import Category as CategorySchema
+from app.schemas import CategoryCreate
 
 # Создаём маршрутизатор с префиксом и тегом
 router = APIRouter(
