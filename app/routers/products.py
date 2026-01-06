@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
-from sqlalchemy import select, update, func
+from sqlalchemy import select, update, func, desc, or_
 
 from app.models.products import Product as ProductModel
 from app.models.categories import Category as CategoryModel
@@ -56,9 +56,6 @@ async def get_all_products(
 
     if category_id:
         filters.append(ProductModel.category_id == category_id)
-    if search:
-        search_value = search.strip()
-        filters.append(func.lower(ProductModel.name).like(f"%{search_value.lower()}%"))
     if min_price:
         filters.append(ProductModel.price >= min_price)
     if max_price:
@@ -70,17 +67,54 @@ async def get_all_products(
 
     # Подсчет общего количества с учетом фильтров
     total_stmt = select(func.count()).select_from(ProductModel).where(*filters)
+
+    rank_col = None
+    if search:
+        search_value = search.strip()
+        if search_value:
+            # строим 2 tsquery для одной и той же фразы
+            ts_query_en = func.websearch_to_tsquery("english", search_value)
+            ts_query_ru = func.websearch_to_tsquery("russian", search_value)
+
+            # Ищем совпадение в любой конфигурации и добавляем в общий фильтр
+            ts_match_any = or_(
+                ProductModel.tsv.op("@@")(ts_query_en),
+                ProductModel.tsv.op("@@")(ts_query_ru),
+            )
+            filters.append(ts_match_any)
+
+            # берем ранг максимальный из 2х
+            rank_col = func.greatest(
+                func.ts_rank_cd(ProductModel.tsv, ts_query_en),
+                func.ts_rank_cd(ProductModel.tsv, ts_query_ru),
+            ).label("rank")
+
+            # total с учетом полнотекстового фильтра
+            total_stmt = select(func.count()).select_from(ProductModel).where(*filters)
+
     total = await db.scalar(total_stmt) or 0
 
-    # Выборка товаров с фильтрами и пагинацией
-    product_stmt = (
-        select(ProductModel)
-        .where(*filters)
-        .order_by(ProductModel.id)
-        .offset((page - 1) * page_size)
-        .limit(page_size)
-    )
-    items = (await db.scalars(product_stmt)).all()
+    # Основной запрос (если есть поиск - добавим ранг в выборку и сортировку)
+    if rank_col is not None:
+        products_stmt = (
+            select(ProductModel, rank_col)
+            .where(*filters)
+            .order_by(desc(rank_col), ProductModel.id)
+            .offset((page - 1) * page_size)
+            .limit(page_size)
+        )
+        result = await db.execute(products_stmt)
+        rows = result.all()
+        items = [row[0] for row in rows]  # сами объекты
+    else:
+        products_stmt = (
+            select(ProductModel)
+            .where(*filters)
+            .order_by(ProductModel.id)
+            .offset((page - 1) * page_size)
+            .limit(page_size)
+        )
+        items = (await db.scalars(products_stmt)).all()
 
     return {"items": items, "total": total, "page": page, "page_size": page_size}
 
