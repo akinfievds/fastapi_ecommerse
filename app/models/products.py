@@ -1,7 +1,16 @@
 from decimal import Decimal
 
-from sqlalchemy import (Boolean, Computed, Float, ForeignKey, Index, Integer,
-                        Numeric, String, text)
+from sqlalchemy import (
+    Boolean,
+    Computed,
+    Float,
+    ForeignKey,
+    Index,
+    Integer,
+    Numeric,
+    String,
+    text,
+)
 from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -44,5 +53,5 @@ class Product(Base):
     seller: Mapped["User"] = relationship("User", back_populates="products")
     reviews: Mapped["Review"] = relationship("Review", back_populates="products")
     cart_items: Mapped[list["CartItem"]] = relationship(
-        "CartItem", back_populates="products", cascade="all, delete-orphan"
+        "CartItem", back_populates="product", cascade="all, delete-orphan"
     )
