@@ -199,11 +199,13 @@ class CartItem(BaseModel):
 
 class Cart(BaseModel):
     """
-    Полнаяи информация о корзине пользователя
+    Полная информация о корзине пользователя
     """
 
     user_id: int = Field(..., description="ID пользователя")
-    items: list[CartItem] = Field(default_factory=list, description="Содержимое корзины")
+    items: list[CartItem] = Field(
+        default_factory=list, description="Содержимое корзины"
+    )
     total_quantity: int = Field(..., ge=0, description="Общее количество товаров")
     total_price: Decimal = Field(..., ge=0, description="Общая стоимость товаров")
 
